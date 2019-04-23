@@ -205,7 +205,7 @@ Scripting | Limited | Smart contracts
     - Ether faucets
         - https://faucet.ropsten.be/
         - Ropsten account: 0x59FcaAcF12d4c50555837e2448D374D9E6442f43
-- 创建账户后，主网和测试网上都有该地址；不同网上该地址的数据（余额）不同；通过不同网上的钱包发起交易，会经过对应的账号
+- 创建账户后，主网和各测试网上都有该地址；不同网上该地址的数据（余额）不同；通过不同网上的钱包发起交易，会经过对应的账号
 - Types of wallet accounts
     1. Account (externally owned account, EOA)
         - Has an address and a private key protected by password
@@ -241,3 +241,40 @@ Scripting | Limited | Smart contracts
         3. Meta Mask (injected Web3)
     - https://github.com/acloudfan/Blockchain-Course-Calculator/blob/master/contracts/CalculatorV2.sol
     - Remix personal mode off; meta mask privacy mode off
+- Ethereum client (node)
+    - Connect to peers using DEVp2p protocol; port 30303
+    - Send blocks, receive blocks, validate, writes to local DB, deploy/execute contracts, mining
+    - DAPP connects to client to interact with the Ethereum network (do transactions)
+        1. IPC-PRC (default)
+        2. JSON-PRC (http://localhost:8545)
+    - Attach JS console to the client and use the Web3 apis to invoking functions
+- Client implementation
+    - [Yellow paper](https://github.com/ethereum/yellowpaper)
+    - Go implementation [Geth](https://github.com/ethereum/go-ethereum/wiki/geth); uses LevelDB
+
+
+
+
+
+
+
+- geth
+    - https://github.com/acloudfan/Blockchain-Course-Geth
+
+- Tokens are implemented as smart contract
+    - Manage balances
+    - Transfers
+    - Rules
+- ERC20
+    - Specification for creating custom tokens
+        - Defines a set of functions: name, return & args are fixed
+        - Define a set of events
+    - 6 functions and 2 events
+
+
+
+
+
+
+
+- Continues at 03_031

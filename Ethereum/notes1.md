@@ -1,0 +1,14 @@
+<!-- https://www.udemy.com/course/ethereum-and-solidity-the-complete-developers-guide/ -->
+- nonce: the number of times the sender has send transactions
+- Smart contract: an account controlled by code
+    - Balance
+    - Storage
+    - Code
+- External account (like the one created using meta mask) can be used across multiple networks
+- Contract account is specific to one individual network
+- One contract source code can be deployed several times on one network, thus having multiple different contract instances (accounts)
+- Compile Solidity => Bytecode ready for deployment + Application Binary Interface
+- Frontend interact with bytecode through ABI
+- 创建合约的交易的发送者是合约的创建者（即拥有者）
+- 合约创建交易的 `to` 字段为空（可据此判断一个交易是否是创建合约的交易）
+- https://iancoleman.io/bip39/
