@@ -1,0 +1,7 @@
+- Hyperledger Fabric has a ledger subsystem comprising two components: the **world state** and the **transaction log**
+    - The world state component describes **the state of the ledger at a given point in time**. It’s the database of the ledger
+    - The transaction log component records all transactions which have resulted in the current value of the world state; it’s **the update history** for the world state
+- The ledger has a replaceable data store for the world state
+    - By default, this is a LevelDB key-value store database
+- The transaction log does not need to be pluggable
+    - It simply **records the before and after values** of the ledger database being used by the blockchain network

@@ -1,0 +1,1 @@
+- Modifying the configuration of the network or deploying a smart contract are recorded on the blockchain following an [ ] endorsement policy that was established for the network and relevant transaction type
