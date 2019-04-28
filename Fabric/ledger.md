@@ -1,7 +1,29 @@
 - Hyperledger Fabric has a ledger subsystem comprising two components: the **world state** and the **transaction log**
     - The world state component describes **the state of the ledger at a given point in time**. It’s the database of the ledger
     - The transaction log component records all transactions which have resulted in the current value of the world state; it’s **the update history** for the world state
+- The ledger is comprised of a blockchain (‘chain’) to store the immutable, sequenced record in blocks, as well as a state database to maintain current fabric state
 - The ledger has a replaceable data store for the world state
     - By default, this is a LevelDB key-value store database
 - The transaction log does not need to be pluggable
     - It simply **records the before and after values** of the ledger database being used by the blockchain network
+- The immutable, shared ledger encodes the entire transaction history for each channel, and includes SQL-like query capability for efficient auditing and dispute resolution
+
+- Assets are represented in Hyperledger Fabric as a collection of key-value pairs, with state changes recorded as transactions on a Channel ledger
+- Assets can be represented in binary and/or JSON form
+    - Assets in Hyperledger Fabric applications can be easily defined and used using the Hyperledger Composer tool
+- State transitions are a result of **chaincode invocations** (‘transactions’) submitted by participating parties. Each transaction results in a set of asset key-value pairs that are committed to the ledger as creates, updates, or deletes
+- There is **one ledger per channel**
+- Each peer maintains a copy of the ledger for each channel of which they are a member
+- Features of a Fabric ledger
+    - Query and update ledger using key-based lookups, range queries, and composite key queries
+    - Read-only queries using a rich query language (if using CouchDB as state database)
+    - Read-only history queries — Query ledger history for a key, enabling data provenance scenarios
+    - Transactions consist of the versions of keys/values that were read in chaincode (read set) and keys/values that were written in chaincode (write set)
+    - Transactions contain **signatures of every endorsing peer** and are submitted to ordering service
+    - Transactions are ordered into blocks and are “delivered” from an ordering service to peers
+    - Peers **validate** transactions against endorsement policies and **enforce** the policies
+    - Prior to appending a block, a **versioning check** is performed to **ensure that states for assets that were read have not changed since chaincode execution time**
+    - There is immutability once a transaction is validated and committed
+    - A channel’s ledger contains **a configuration block** defining policies, access control lists, and other pertinent information
+    - Channels contain Membership Service Provider instances allowing for crypto materials to be derived from different certificate authorities
+- Chaincodes can be installed only on specific peers that need to access the asset states of a ledger

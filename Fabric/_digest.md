@@ -1,0 +1,4 @@
+- Orderer 只做排序，不执行交易、维护账本
+- Peer 只执行交易、维护账本，不做排序
+- 每个 channel 有各自的账本；chaincode 也从属于各自账本
+- [ ] peer, orderer 能否从属于多个 channel
