@@ -1,8 +1,8 @@
 # Blockchain network
-- A blockchain network is a technical infrastructure that provides ledger and smart contract services to applications
+<!-- - A blockchain network is a technical infrastructure that provides ledger and smart contract services to applications
     - Primarily, smart contracts are used to generate transactions which are subsequently distributed to every peer node in the network where they are immutably recorded on their copy of the ledger
 - In most cases, multiple organizations come together as a consortium to form the network and their permissions are determined by a set of policies that are agreed by the consortium when the network is originally configured
-    - Moreover, network policies can change over time subject to the agreement of the organizations in the consortium
+    - Moreover, network policies can change over time subject to the agreement of the organizations in the consortium -->
 ## 1. Creating the network
 - The network is formed when an orderer is started
     - The ordering service comprising a single node, O4, is configured according to a network configuration NC4
@@ -40,7 +40,7 @@
 - 组织 R4 更新网络配置 NC4，把组织 R1 也加为管理员
     - 此后 R1 和 R4 均有更改网络配置的权限
 - CA1 加入进来，用于标识来自组织 R1 的用户
-- 尽管共识节点 O4 运行在组织 R4，只有存在网络简介，R1 对 O4 也有和 R4 相同的管理权限
+- 尽管共识节点 O4 运行在组织 R4，只有存在网络连接，R1 对 O4 也有和 R4 相同的管理权限
     - 此处的 orderer 是单节点，但通常情况下 orderer 会是多节点，可以被配置在不同组织的不同节点上
 ![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.2.1.png)
 ## 3. Define a consortium
@@ -85,9 +85,9 @@
 - 合约必须安装并初始化
 ![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.6.png)
 ### Installing a smart contract
-- 只能合约开发完成后，R1 的管理员将其安装到 P1
+- 合约开发完成后，R1 的管理员将其安装到 P1
 - 安装完成后，P1 可以看到 S5 的实现逻辑
-- 一个组织在 channel 上有多个 peer 时，可以选择部分节点安装智能合约，不需要在所有节点都安装
+- 一个组织在 channel 上有多个 peer 时，可以选择**部分节点安装智能合约**，不需要在所有节点都安装
 ### Instantiating a smart contract
 - C1 的其它成员在 S5 被初始化之前感知不到它的存在
 - R1 的管理员通过 P1 初始化 S5 后，S5 可以被 A1 调用
@@ -100,4 +100,149 @@
 - Client applications invoke smart contracts by sending transaction **proposals** to **peers** owned by the organizations specified by the smart contract endorsement policy
 - The transaction proposal serves as input to the smart contract, which uses it to generate an **endorsed transaction** response, which is returned by the peer node to the client application
 ## 7. Network completed
+- The network has grown through the addition of infrastructure from organization R2
+- Specifically, (an administrator in) R2 has added peer node P2, which hosts a copy of ledger L1, and chaincode S5
+- P2 has also joined channel C1, as has application A2
+- A2 and P2 are identified using certificates from CA2
+- All of this means that both applications A1 and A2 can invoke S5 on C1 either using peer node P1 or P2
 ![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.7.png)
+### Generating and accepting transactions
+- 安装了合约的 peer 才可以产生交易
+- All peer nodes can **validate** and subsequently **accept or reject** transactions onto their copy of the ledger L1
+- 只有安装了合约的 peer 才可以参与背书交易的过程
+### Types of peers
+- In Hyperledger Fabric, while **all peers are the same**, they can **assume multiple roles** depending on how the network is configured
+    1. Committing peer
+        - 每个 peer 都是 committing peer
+        - It **receives** blocks of generated transactions, which are subsequently **validated** before they are committed to the peer node’s copy of the ledger as an append operation
+    2. Endorsing peer
+        - 每个安装了合约的 peer 都可以成为 endorsing peer
+        - To actually be an endorsing peer, the smart contract on the peer must be [ ] **used by a client application to generate a digitally signed transaction response**
+        - **合约的**背书策略规定了交易必须在某些组织的 peer 签名过后才可以写入账本
+        - An endorsement policy **for a smart contract** identifies the **organizations whose peer** should digitally **sign a generated transaction** before it can be accepted onto a committing peer’s copy of the ledger
+    3. Leader peer
+        - 若某个组织在 channel 中有多个 peer，leader peer 负责将交易从 orderer 分发到该组织的 committing peer
+        - Peer 可以选择参与静态或动态的领导权选举
+            - For the static set, zero or more peers can be configured as leaders
+            - For the dynamic set, one peer will be elected leader by the set. If a leader peer fails, then the remaining peers will re-elect a leader
+        - 一个组织里可以有一个或多个 leader peer 连接到排序服务
+            - This can help to improve resilience and scalability in large networks which process high volumes of transactions
+    4. Anchor peer
+        - 通过锚节点与其他组织的 peer 通信
+        - 锚节点的信息在该组织的 channel 配置里
+        - An organization can have zero or more anchor peers defined for it
+    - 一个 peer 可以同时是以上 4 中角色
+    - 一个组织中必须有 1,2,3 的 peer 角色
+### Install not instantiate
+- R2 上的 S5 不需要被初始化
+- 一个合约的初始化只需要执行一次，所有后来加入 channel 的 peer (安装了该合约的) 就知道合约已可调用
+    - This fact reflects the fact that ledger L1 and smart contract really exist in a physical manner on the peer nodes, and a logical manner on the channel
+    - R2 is merely adding another physical instance of L1 and S5 to the network
+- Copies of smart contract S5 will usually be identically implemented using the same programming language, but if not, they must be semantically equivalent
+- The careful addition of peers to the network can help support increased throughput, stability, and resilience
+- The technical mechanism by which peers within an individual organization efficiently discover and communicate with each other – the [ ] [gossip protocol](https://hyperledger-fabric.readthedocs.io/en/release-1.4/gossip.html#gossip-protocol) – will accommodate a large number of peer nodes in support of such topologies
+- The careful use of network and channel policies allow even large networks to be well-governed
+    - Organizations are free to add peer nodes to the network so long as they conform to the policies agreed by the network
+    - Network and channel policies create the balance between autonomy and control which characterizes a de-centralized network
+## 8. Simplifying the visual vocabulary
+- The network diagram has been simplified by replacing channel lines with connection points, shown as blue circles which include the channel number
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.8.png)
+## 9. Adding another consortium definition
+- Define a new consortium, X2, for R2 and R3
+- A network administrator from organization R1 or R4 has added a new consortium definition, X2, which includes organizations R2 and R3. This will be used to define a new channel for X2
+    - Consortium X2 has been introduced in order to be able to create a new channel for R2 and R3
+- A new channel can only be created by those organizations specifically identified in the network configuration policy, NC4, as having the appropriate rights to do so, i.e. R1 or R4
+    - This is an example of a policy which separates organizations that can manage resources at the network level versus those who can manage resources at the channel level
+- In practice, consortium definition X2 has been added to the network configuration NC4
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.9.pngX)
+## 10. Adding a new channel
+- A new channel C2 has been created for R2 and R3 using consortium definition X2
+- The channel has a channel configuration CC2, completely separate to the network configuration NC4, and the channel configuration CC1
+- Channel C2 is managed by R2 and R3 who have equal rights over C2 as defined by a policy in CC2
+- R1 and R4 have no rights defined in CC2 whatsoever
+- The channel configuration CC2 now contains the policies that govern channel resources, assigning management rights to organizations R2 and R3 over channel C2
+- Note how the channel configurations CC1 and CC2 remain completely separate from each other, and completely separate from the network configuration, NC4
+- As the network and channels evolve, so will the network and channel configurations
+- There is a process by which this is accomplished in a controlled manner – involving configuration transactions which capture the change to these configurations
+- Every configuration change results in a new **configuration block transaction** being generated
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.10.png)
+### Network and channel configuration
+- Network and channel configurations are important because they encapsulate the **policies** agreed by the network members, which provide a shared reference for controlling access to network resources
+- Network and channel configurations also contain **facts** about the network and channel composition, such as the name of consortia and its organizations
+- When the network is first formed using the ordering service node O4, its behaviour is governed by the network configuration NC4
+- The initial configuration of NC4 only contains policies that permit organization R4 to manage network resources
+- NC4 is subsequently updated to also allow R1 to manage network resources
+- Once this change is made, any administrator from organization R1 or R4 that connects to O4 will have network management rights because that is what the policy in the network configuration NC4 permits
+- Internally, each node in the ordering service records each channel in the network configuration, so that there is a record of each channel created, at the network level
+    - It means that although ordering service node O4 is the **actor** that created consortia X1 and X2 and channels C1 and C2, the **intelligence** of the network is contained in the network configuration NC4 that O4 is obeying
+- As long as O4 behaves as a good actor, and correctly implements the policies defined in NC4 whenever it is dealing with network resources, our network will behave as all organizations have agreed
+- In many ways NC4 can be considered more important than O4 because, ultimately, it controls network access
+- The same principles apply for channel configurations with respect to peers
+    - In our network, P1 and P2 are likewise good actors
+    - When peer nodes P1 and P2 are interacting with client applications A1 or A2 they are each using the policies defined within channel configuration CC1 to control access to the channel C1 resources
+- If A1 wants to access the smart contract chaincode S5 on peer nodes P1 or P2, each peer node uses its **copy** of CC1 to determine the operations that A1 can perform
+- Even though there is logically a single configuration, it is actually replicated and kept consistent by every node that forms the network or channel
+- Similarly ordering service node O4 has a copy of the network configuration, but in a multi-node configuration, every ordering service node will have its own copy of the network configuration
+- Both network and channel configurations are kept consistent using the same blockchain technology that is used for user transactions – but for **configuration transactions**
+- To change a network or channel configuration, an administrator must submit a configuration transaction to change the network or channel configuration
+    - It must be signed by the organizations identified in the appropriate policy as being responsible for configuration change
+    - This policy is called the `mod_policy`
+- The ordering service nodes operate a mini-blockchain, connected via the **system channel**
+    - The system channel ordering service nodes distribute **network configuration transactions**
+    - These transactions are used to co-operatively maintain a consistent copy of the network configuration at each ordering service node
+- In a similar way, peer nodes in an application channel can distribute channel configuration transactions
+    - Likewise, these transactions are used to maintain a consistent copy of the channel configuration at each peer node
+- Objects like network configurations, that are logically single, turn out to be physically replicated among a set of ordering services nodes
+- We also see it with channel configurations, ledgers, and to some extent smart contracts which are installed in multiple places but whose interfaces exist logically at the channel level
+- This balance between objects that are logically singular, by being physically distributed is a common pattern in Hyperledger Fabric
+- It’s a **pattern** you see repeated time and again in Hyperledger Fabric, and enables Hyperledger Fabric to be both de-centralized and yet manageable at the same time
+## 11. Adding another peer
+- Client applications A3 can use channel C2 for communication with peer P3 and ordering service O4. Ordering service O4 can make use of the communication services of channels C1 and C2
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.11.png)
+## 12. Joining a peer to multiple channels
+- R2 is a member of both consortia X1 and X2 by joining it to multiple channels
+- Ordering service O4 can make use of the communication services of channels C1 and C2
+- Client application A2 can use channel C1 for communication with peers P1 and P2 and channel C2 for communication with peers P2 and P3 and ordering service O4
+- Peer node P2 has smart contract S5 installed for channel C1 and smart contract S6 installed for channel C2
+- Peer node P2 is a full member of both channels at the same time via different smart contracts for different ledgers
+- Peer node P2’s behaviour is controlled very differently depending upon the channel in which it is transacting
+    - Specifically, the policies contained in channel configuration CC1 dictate the operations available to P2 when it is transacting in channel C1, whereas it is the policies in channel configuration CC2 that control P2’s behaviour in channel C2
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.12.png)
+### The ordering services
+- The ordering service node appears to be a centralized component
+    - It was used to create the network initially, and connects to every channel in the network
+    - Even though we added R1 and R4 to the network configuration policy NC4 which controls the orderer, the node was running on R4’s infrastructure
+    - In a world of de-centralization, this looks wrong
+- The ordering service can itself too be completely de-centralized
+    - An ordering service could be comprised of many individual nodes owned by different organizations
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.15.png)
+- The ordering service comprises ordering service nodes O1 and O4. O1 is provided by organization R1 and node O4 is provided by organization R4
+- The network configuration NC4 defines network resource permissions for actors from both organizations R1 and R4
+- The network configuration policy, NC4, permits R1 and R4 equal rights over network resources
+- Client applications and peer nodes from organizations R1 and R4 can manage network resources by connecting to either node O1 or node O4, because both nodes behave the same way, as defined by the policies in network configuration NC4
+    - In practice, actors from a particular organization tend to use infrastructure provided by their home organization, but that’s certainly not always the case
+### De-centralized transaction distribution
+- As well as being the **management point** for the network, the ordering service also provides another key facility – it is the **distribution point** for transactions
+- The ordering service is the component which **gathers endorsed transactions** from applications and **orders them into transaction blocks**, which are subsequently **distributed** to every peer node in the channel
+- At each of these committing peers, transactions are recorded, whether valid or invalid, and their local copy of the ledger updated appropriately
+- When acting at the channel level, O4’s role is to gather transactions and distribute blocks inside channel C1
+    - It does this according to the policies defined in channel configuration CC1
+- When acting at the network level, O4’s role is to provide a management point for network resources according to the policies defined in network configuration NC4
+### Changing policy
+- Policy change is managed by a policy within the policy itself
+- The `modification policy`, or `mod_policy` for short, is a first class policy within a network or channel configuration that manages change
+- When the network was initially set up, only organization R4 was allowed to manage the network
+- In practice, this was achieved by making R4 the only organization defined in the network configuration NC4 with permissions to network resources
+- Moreover, the `mod_policy` for NC4 only mentioned organization R4 – only R4 was allowed to change this configuration
+- We then evolved the network N to also allow organization R1 to administer the network
+    - R4 did this by adding R1 to the policies for channel creation and consortium creation
+    - Because of this change, R1 was able to define the consortia X1 and X2, and create the channels C1 and C2
+    - R1 had equal administrative rights over the channel and consortium policies in the network configuration
+- R4 could add R1 to the `mod_policy` such that R1 would be able to manage change of the network policy too
+    - This power is much more powerful than the first, because now R1 now has full control over the network configuration NC4
+    - This means that R1 can, in principle remove R4’s management rights from the network
+        - In practice, R4 would configure the `mod_policy` such that R4 would need to also approve the change, or that all organizations in the `mod_policy` would have to approve the change
+- The `mod_policy` behaves like every other policy inside a network or channel configuration; it defines a set of organizations that are allowed to change the `mod_policy` itself
+## 13. Network fully formed
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/network.diagram.14.png)
+- The channel configuration of the system channel is part of the network configuration, NC4
