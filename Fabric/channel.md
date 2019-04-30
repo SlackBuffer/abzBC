@@ -1,2 +1,3 @@
-- All data, including transaction, member and channel information, on a channel are invisible and inaccessible to any network members not explicitly granted access to that channel
-- Only those nodes that participate in a channel have access to the smart contract (**chaincode**) and data transacted
+<!-- - All data, including transaction, member and channel information, on a channel are invisible and inaccessible to any network members not explicitly granted access to that channel -->
+<!-- - Only those nodes that participate in a channel have access to the smart contract (**chaincode**) and data transacted -->
+- Channels contain Membership Service Provider instances allowing for crypto materials to be derived from different certificate authorities
