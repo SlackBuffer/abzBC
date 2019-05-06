@@ -1,3 +1,4 @@
+- 账本不可纂改地记录着由智能合约生成的交易
 - Fabric 的账本包括世界状态和交易日志两部分
     - 世界状态描述某个时间点时账本的状态，是账本的数据库
     - 交易日志记录了形成当前世界状态的所有交易，是世界状态的更新历史
@@ -35,3 +36,4 @@
     - Prior to appending a block, a **versioning check** is performed to **ensure that states for assets that were read have not changed since chaincode execution time**
     - There is immutability once a transaction is validated and committed
     - A channel’s ledger contains **a configuration block** defining policies, access control lists, and other pertinent information -->
+- 一个账本可以有多个可以访问账本的智能合约

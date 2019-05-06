@@ -29,5 +29,4 @@
 <!-- - Fabric currently offers 2 CFT ordering service implementations. The first is based on the [etcd](https://coreos.com/etcd/) library of the [Raft protocol](https://raft.github.io/raft.pdf). The other is [Kafka](https://kafka.apache.org/) (which uses [Zookeeper](https://zookeeper.apache.org/) internally)
     - These are not mutually exclusive. **A Fabric network can have multiple ordering services** supporting different applications or application requirements -->
 <!-- - Consensus is defined as the full-circle verification of the correctness of a set of transactions comprising a block -->
-- [ ] https://hyperledger-fabric.readthedocs.io/en/release-1.4/txflow.html
-- [ ] https://hyperledger-fabric.readthedocs.io/en/release-1.4/arch-deep-dive.html#swimlane
+
