@@ -37,3 +37,50 @@
     - There is immutability once a transaction is validated and committed
     - A channel’s ledger contains **a configuration block** defining policies, access control lists, and other pertinent information -->
 - 一个账本可以有多个可以访问账本的智能合约
+- 账本不保存业务对象，保存的是这些对象的真相（facts）- 当前状态和通向当前状态的交易历史
+- 账本包括 2 部分
+    1. 世界状态
+        - 账本的当前值
+        - 用键值对表示
+        - 每个 chaincode 都有它自己的独立于其它 chaincode 的世界状态
+            - World states are in a namespace so that only **smart contracts within the same chaincode** can access a given namespace
+    2. 区块链
+        - 交易日志，记录了所有达到点前世界状态的所有变更
+        - [ ] A blockchain is not namespaced. It contains transactions from many different smart contract namespaces
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/ledger.diagram.3.png)
+- 世界状态用数据库实现
+- 版本号在每次状态改变后都会递增，用于检查当前状态和背书交易时是否一致
+- 账本刚创建时，世界状态为空
+- 由于区块链记录了所有世界状态的变更，可以很方便地从区块生成世界状态
+- 每个区块的区块头包含区块内交易的 hash 和前一个区块头里的 hash
+- 区块链用文件实现
+- 创世块不包含用户交易，包含一条配置交易（configuration transaction）
+- 区块
+    1. 区块头
+        1. 区块编号（起始为 0）
+        2. 当前区块 hash - 当前区块内所有交易的 hash
+        3. 父区块 hash - 父区块所有交易 hash 的副本
+        ![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/ledger.diagram.4.png)
+    2. 区块数据
+        - 排好序的交易
+    4. 区块 metadata
+        - 包括区块的写入时间，证书，区块写入者的公钥和签名
+        - 随后区块提交者会对每一条交易添加有效/无效的标识；该信息包括在 hash 里，hash 在区块创建时就已生成
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/ledger.diagram.5.png) 
+- 交易
+    - Header
+        - 包含交易的 metadata 信息，如 chaincode 名称和版本号
+    - Signature
+        - 由客户端的私钥生成的密码学签名，用于校验交易详情未被篡改
+    - Proposal
+        - 应用向智能合约提供的创建了 proposed leger update 的入参
+        - 入参和当前世界状态共同决定新的世界状态
+    - Response
+        - 以 read write set (RW-set) 的形式记录变更前后世界状态
+        - 是智能合约的输出（output）
+    - Endorsements
+        - 一组背书策略要求的组织签过名的 transaction response
+- DB
+  - A LevelDB database is closely co-located with a network node – it is embedded within the same operating system process
+  - CouchDB is a particularly appropriate choice when ledger states are structured as JSON documents because CouchDB supports the rich queries and update of richer data types often found in business transactions
+      - Implementation-wise, CouchDB runs in a separate operating system process, but there is still a 1:1 relation between a peer node and a CouchDB instance

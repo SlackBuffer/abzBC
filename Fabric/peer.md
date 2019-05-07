@@ -56,6 +56,10 @@
 - 对于不一致的 transaction response，应用可以选择丢弃，终止后续的流程
 ### 2. Ordering and packaging transactions into blocks
 - Orderer 收到来自多个应用的包含经过背书的 transaction proposal response 的交易，将交易排序、打包成块
+- 排序服务节点同时接收到多个应用的经过背书的 propose transaction response
+- 一个区块的交易数有 channel 配置参数（`BatchSize`, `BatchTimeout`）控制
+- 区块保存到 orderer 的账本并分发到 channel 中的 peer
+    - 若 peer 不在线，则会在重新连接到 orderer 后接收到区块，或是通过与其它 peer 的 gossip 获得
 ### 3. Validation and commit
 ![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/peers.diagram.12.png)
 - Orderer 将区块分发到所有与之相连的 peer

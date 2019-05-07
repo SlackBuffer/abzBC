@@ -23,3 +23,39 @@
 <!-- - Chaincode functions execute against the ledger’s current state database and are ***initiated through a transaction proposal*** -->
 <!-- - Chaincodes do not have **direct** access to the ledger state -->
 <!-- - Chaincode execution results in a set of key-value writes (write set) that can be submitted to the network and applied to the ledger on all peers -->
+- Whereas a ledger holds facts about the current and historical state of a set of business objects, a smart contract defines the executable logic that generates new facts that are added to the ledger
+- 管理员用 chaincode 将相关的智能合约聚合起来进行开发；chaincode 也可用作 Fabric 底层的系统编程
+- 智能合约将组织间的交易逻辑定义成可执行的代码
+- In general, a smart contract defines the transaction logic that controls the lifecycle of a business object contained in the world state. It is then packaged into a chaincode which is then deployed to a blockchain network
+    - Think of smart contracts as governing transactions, whereas chaincode governs how smart contracts are packaged for deployment
+- 智能合约定义在 chaincode 里，一个 chaincode 可包含多个智能合约
+- A smart contract is a domain specific program which relates to specific business processes, whereas a chaincode is a technical **container** of a group of related smart contracts for installation and instantiation
+- 智能合约访问账本的区块链和世界状态
+    - Smart contracts primarily put, get and delete states in the world state, and can also query the immutable blockchain record of transactions
+- 每个 chaincode 都有与之关联的、适用于 chaincode 中所有智能合约背书策略
+    - 背书策略规定智能合约生成的交易必须经由网络中特定的组织签名过后才被会认定为有效
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/smartcontract.diagram.03.png)
+- 智能合约将 transaction proposal 作为入参，结合程序进行读写账本
+- 对世界状态的改变表示成 transaction proposal response（or just transaction response）
+- Transaction proposal response 包含 read-write set，即读到的状态和可能被写入的新状态
+- 所有交易都有标识符，proposal 和特定组织签名过的 response
+- 所有交易（包括无效交易）都被记录在区块链上，但只有有效的交易才会写入世界状态
+![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/smartcontract.diagram.04.png)
+- 交易 `t3` 的输出是 `{CAR1.owner=ORG1, CAR1.owner=ORG2}`，表示所有权从 `ORG1` 到 `ORG2`
+- 分发到所有 peer 的交易的校验分为两步
+    1. 检查交易是否已按照背书策略的要求得到签名
+    2. 检查当前的世界状态和交易被签名时的 read set 是否一致
+- 管理员初始化 chaincode 时定义它的背书策略，可以通过升级 chaincode 来改变这书策略
+- 背书策略对同一个 chaincode 内的智能合约有相同效力
+- 智能合约可以调用同一 channel 和不同 channel 上的智能合约
+- 系统合约用于与底层交互
+    - Lifecycle system chaincode (LSCC) 
+        - 运行在所有 peer 上，负责 package signing, install, instantiate, and upgrade chaincode requests
+    - Configuration system chaincode (CSCC) 
+        - 运行在所有 peer 上，负责 channel 配置的变更
+    - Query system chaincode (QSCC)
+        - 运行在所有 peer 上，提供账本 APIs，包括区块查询、交易查询
+    - Endorsement system chaincode (ESCC)
+        - 运行在背书节点上，负责对 transaction response 签名
+    - Validation system chaincode (VSCC)
+        - 校验交易，包括检查背书策略，read-write set 版本

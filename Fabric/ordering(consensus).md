@@ -29,4 +29,19 @@
 <!-- - Fabric currently offers 2 CFT ordering service implementations. The first is based on the [etcd](https://coreos.com/etcd/) library of the [Raft protocol](https://raft.github.io/raft.pdf). The other is [Kafka](https://kafka.apache.org/) (which uses [Zookeeper](https://zookeeper.apache.org/) internally)
     - These are not mutually exclusive. **A Fabric network can have multiple ordering services** supporting different applications or application requirements -->
 <!-- - Consensus is defined as the full-circle verification of the correctness of a set of transactions comprising a block -->
-
+- 账本分叉（ledger "fork"）
+    - 网络参与方对交易的顺序无法达成共识
+- 无权限区块链网络依靠基于概率的共识算法来最大程度保证账本一致性
+    - Rely on probabilistic consensus algorithms which eventually guarantee ledger consistency to a high degree of probability
+- Fabric 依靠的是确定性公式算法（deterministic consensus algorithms）
+- orderer 除了排序的角色之外，还维护允许创建 channel 的组织列表（称作集团，consortium）
+    - 列表保存在 “orderer system channel” (also known as the “ordering system channel”) 的配置中
+    - 默认情况下，只有 orderer 的管理员可以编辑此列表和保存该列表的 channel
+    - 一个 orderer 可以维护多个组织列表
+- Orderers also enforce basic access control for channels, restricting who can read and write data to them, and who can configure them
+- Remember that who is authorized to modify a configuration element in a channel is subject to the policies that the relevant administrators set when they created the consortium or the channel
+- Configuration transactions are processed by the orderer, as it needs to know the current set of policies to execute its basic form of access control
+    - In this case, the orderer processes the configuration update to make sure that the requestor has the proper administrative rights
+    - If so, the orderer validates the update request against the existing configuration, generates a new configuration transaction, and packages it into a block that is relayed to all peers on the channel
+    - The peers then process the configuration transactions in order to verify that the modifications approved by the orderer do indeed satisfy the policies defined in the channel
+- orderer 节点从属于一个组织
