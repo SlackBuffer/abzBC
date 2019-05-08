@@ -60,6 +60,9 @@
 - 一个区块的交易数有 channel 配置参数（`BatchSize`, `BatchTimeout`）控制
 - 区块保存到 orderer 的账本并分发到 channel 中的 peer
     - 若 peer 不在线，则会在重新连接到 orderer 后接收到区块，或是通过与其它 peer 的 gossip 获得
+- 块中交易的顺序不一定和 orderer 收到交易的顺序相同
+- Orderer 生成的块就是最终的块，不存在不同的块竞争上链的情况
+    - This strict ordering of transactions within blocks makes Hyperledger Fabric a little different from other blockchains where the same transaction can be packaged into multiple different blocks that compete to form a chain
 ### 3. Validation and commit
 ![](https://hyperledger-fabric.readthedocs.io/en/release-1.4/_images/peers.diagram.12.png)
 - Orderer 将区块分发到所有与之相连的 peer
@@ -72,6 +75,7 @@
 - 若交易已被正确地背书，peer 会尝试将其添加到账本
 - 添加之前，peer 会检查账本的一致性
     - Verify that the current state of the ledger is compatible with the state of the ledger when the proposed update was generated
+- 校验失败的交易仍保留在区块中，但该交易不会被用于更新账本
 - Failed transactions are not applied to the ledger, but they are retained for audit purposes, as are successful transactions
 - 此阶段不需要运行 chaincode
 - chaincode 只需要安装在背书节点
