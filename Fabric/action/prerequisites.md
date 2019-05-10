@@ -18,8 +18,12 @@ docker-compose --version
     ## uninstall
     # sudo rm -rf /usr/local/go
     sudo tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz
-    export PATH=$PATH:/usr/local/go/bin
-    source ~/.profile
+    # put in ~/.zshrc
+    export PATH=$PATH:/usr/local/go/bin # for just Golang, only this one is enough
+    export GOPATH=$HOME/go
+    export PATH=$PATH:$GOPATH/bin
+    source ~/.zshrc
+    # source ~/.profile
 
     go version
     ```
@@ -58,5 +62,14 @@ serverSlots1 = 32
 
 1.（若没启动）`sudo sslocal -c /etc/shadowsocks.json -d start`
 2.（若没启动）`sudo /etc/init.d/polipo restart`
-3. `export http_proxy="http://127.0.0.1:8123/"`
-4. `curl www.google.com`, `curl ip.gs`, `curl ip.sb`
+1. `export http_proxy="http://127.0.0.1:8123/"`
+2. `curl www.google.com`, `curl ip.gs`, `curl ip.sb`
+# NodeJS
+- https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04
+- https://github.com/nvm-sh/nvm#manual-install
+# Python (Ubuntu16.04)
+- Python 2.7 is required
+# Fabric scripts
+- Latest production release: `curl -sSL http://bit.ly/2ysbOFE | bash -s` or `curl https://raw.githubusercontent.com/hyperledger/fabric/master/scripts/bootstrap.sh | bash -s`
+    - `binaryDownload()` 将二进制（`bin`）和配置（`/config`）下载下来放入 `fabric-sample` 目录，自行拷入即可，不需通过脚本
+- https://github.com/hyperledger/fabric-samples
