@@ -1,3 +1,5 @@
+// https://github.com/hyperledger/fabric-samples/blob/master/commercial-paper/organization/magnetocorp/contract/lib/papercontract.js
+
 /*
 SPDX-License-Identifier: Apache-2.0
 */

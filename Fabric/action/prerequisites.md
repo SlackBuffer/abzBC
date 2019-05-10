@@ -28,6 +28,7 @@ docker-compose --version
     go version
     ```
 
+- https://github.com/golang/go/wiki/SettingGOPATH
 # Shadowsocks
 - https://jingsam.github.io/2016/05/08/setup-shadowsocks-http-proxy-on-ubuntu-server.html
 
@@ -73,3 +74,12 @@ serverSlots1 = 32
 - Latest production release: `curl -sSL http://bit.ly/2ysbOFE | bash -s` or `curl https://raw.githubusercontent.com/hyperledger/fabric/master/scripts/bootstrap.sh | bash -s`
     - `binaryDownload()` 将二进制（`bin`）和配置（`/config`）下载下来放入 `fabric-sample` 目录，自行拷入即可，不需通过脚本
 - https://github.com/hyperledger/fabric-samples
+# bat
+- https://github.com/sharkdp/bat#installation
+
+    ```bash
+    wget https://github.com/sharkdp/bat/releases/download/v0.10.0/bat_0.10.0_amd64.deb
+    sudo dpkg -i bat_0.10.0_amd64.deb
+    ```
+
+- https://github.com/sharkdp/bat#highlighting-theme
