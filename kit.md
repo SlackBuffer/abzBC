@@ -1,5 +1,5 @@
 # Linux
-- `printenv | less`
+- `printenv | less`; `echo $CHANNEL_NAME`
 # Docker
 - `docker stop $(docker ps -aq)`
 # [YAML](https://yaml.org/spec/1.2/spec.html)
