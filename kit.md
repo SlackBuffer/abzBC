@@ -1,3 +1,5 @@
+# Linux
+- `printenv | less`
 # Docker
 - `docker stop $(docker ps -aq)`
 # [YAML](https://yaml.org/spec/1.2/spec.html)
