@@ -1,3 +1,13 @@
+# Mac 
+## fabric-samples
+
+```bash
+curl https://raw.githubusercontent.com/hyperledger/fabric/master/scripts/bootstrap.sh >bootstrap.sh
+chmod +x bootstrap.sh
+bootstrap.sh -b
+# run `bootstrap.sh` to get binary address; download manually; put into `fabric-samples`
+```
+
 # [cURL](https://curl.haxx.se/download.html)
 - Mac uses 7.63.0, Ubuntu 16.04 uses 7.64.1
 # Docker
@@ -30,6 +40,7 @@ docker-compose --version
 
 - https://github.com/golang/go/wiki/SettingGOPATH
 # Shadowsocks
+- `ping 5new-jp2.ioswin.win`
 - https://jingsam.github.io/2016/05/08/setup-shadowsocks-http-proxy-on-ubuntu-server.html
 
 ```json

@@ -4,7 +4,7 @@
 
 ```bash
 # fabric-samples/basic-network
-# 起参数里指定的 3 个容器
+# 运行参数里指定的 3 个容器
 docker-compose -f docker-compose.yml up ca.example.com orderer.example.com peer0.org1.example.com couchdb
 docker ps -a
 # wait for Hyperledger Fabric to start

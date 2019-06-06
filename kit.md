@@ -1,5 +1,8 @@
 # Linux
 - `printenv | less`; `echo $CHANNEL_NAME`
+- [tcptrack](https://www.howtoforge.com/tracking_tcp_connectios_with_tcptrack)
+    - `sudo apt-get install tcptrack`
+    - `sudo tcptrack -i ens3`
 # Docker
 - `docker stop $(docker ps -aq)`
 # [YAML](https://yaml.org/spec/1.2/spec.html)
