@@ -1,4 +1,6 @@
 - [Language Guide (proto3)](https://developers.google.com/protocol-buffers/docs/proto3)
+- [API reference](https://developers.google.com/protocol-buffers/docs/reference/overview)
+# Basics
 - With protocol buffers, you write a `.proto` description of the data structure you wish to store. From that, the **protocol buffer compiler creates a class** that implements automatic encoding and parsing of the protocol buffer data with an efficient binary format
     - The generated class provides getters and setters for the fields that make up a protocol buffer and takes care of the details of reading and writing the protocol buffer as a unit
     - Importantly, the protocol buffer format supports the idea of extending the format over time in such a way that the code can still read data encoded with the old format
@@ -72,3 +74,67 @@
     - > [Some exceptions](https://developers.google.com/protocol-buffers/docs/proto3#updating)
 - If you follow these rules, old code will happily read new messages and simply ignore any new fields. To the old code, singular fields that were deleted will simply have their default value, and deleted repeated fields will be empty. New code will also transparently read old messages
 - New fields will not be present in old messages, so you will need to do something reasonable with the default value
+# Language guide
+## Define a message type
+
+```proto
+syntax = "proto3";
+message SearchRequest {
+  string query = 1;
+  int32 page_number = 2;
+  int32 result_per_page = 3;
+}
+
+message SearchResponse {
+    // ...
+}
+```
+
+- The first line of the file specifies that you're using `proto3` syntax: if you don't do this the protocol buffer compiler will assume you are using `proto2`
+    - This must be the first non-empty, non-comment line of the file
+### Specifying field types
+- Scalar types
+- Composite types
+    - Enumerations
+    - Other message types
+### Assigning field numbers
+- Each field in the message definition has a **unique number**
+    - These field numbers are used to **identify** your fields in the [message binary format](https://developers.google.com/protocol-buffers/docs/encoding), and should not be changed once your message type is in use
+- Field numbers in the range 1 through 15 take **one byte** to encode, including the field number and the field's type (you can find out more about this in [Protocol Buffer Encoding](https://developers.google.com/protocol-buffers/docs/encoding#structure))
+- Field numbers in the range 16 through 2047 take **two bytes**
+- Reserve the numbers 1 through 15 for very frequently occurring message elements
+    - Remember to leave some room for frequently occurring elements that might be added in the future
+- The smallest field number you can specify is 1, and the largest is 2^229 - 1, or 536,870,911
+    - You also cannot use the numbers 19000 through 19999 (`FieldDescriptor::kFirstReservedNumber `through `FieldDescriptor::kLastReservedNumber`), as they are reserved for the Protocol Buffers implementation - the protocol buffer compiler will complain if you use one of these reserved numbers in your `.proto`
+    - Similarly, you cannot use any previously reserved field number
+### Specify field rules
+- Message fields can be one of the following:
+    - singular: a well-formed message can have zero or one of this field (but not more than one)
+        - This is the default field rule for proto3 syntax
+    - `repeated`: this field can be repeated any number of times (including zero) in a well-formed message
+        - The order of the repeated values will be preserved
+- In proto3, `repeated` fields of scalar numeric types use `packed` encoding by default
+    - https://developers.google.com/protocol-buffers/docs/encoding#packed
+### Adding more message types
+- Multiple message types can be defined in a single `.proto` file
+- This is useful if you are defining multiple related messages
+### Adding comments
+- Use C/C++-style `//` and `/* ... */` syntax
+### Reserved fields
+- If you update a message type by entirely removing a field, or commenting it out, future users can reuse the field number when making their own updates to the type
+- This can cause severe issues if they later load old versions of the same `.proto`, including data corruption, privacy bugs, and so on
+- One way to make sure this doesn't happen is to specify that the field numbers (and/or names, which can also cause issues for JSON serialization) of your deleted fields are `reserved`
+	
+    ```proto
+    message Foo {
+        reserved 2, 15, 9 to 11;
+        reserved "foo", "bar";
+    }
+    ```
+
+    - The protocol buffer compiler will complain if any future users try to use these field identifiers
+    - Can't mix field names and field numbers in the same `reserved` statement
+### What's generated from `.proto`
+- When you run the protocol buffer compiler on a `.proto`, the compiler generates the code in your chosen language you'll need to work with the message types you've described in the file, including getting and setting field values, serializing your messages to an output stream, and parsing your messages from an input stream
+## Scalar value types
+## Default values

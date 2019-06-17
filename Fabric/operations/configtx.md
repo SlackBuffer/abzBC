@@ -7,4 +7,5 @@
 ## Anatomy of a configuration
 - Configuration is stored as a transaction of type `HeaderType_CONFIG` in a block with no other transactions
     - These blocks are referred to as Configuration Blocks, the first of which is referred to as the Genesis Block
-- The proto structures for configuration are stored in <u>[`fabric/protos/common/configtx.proto`](./configtx.proto)</u>. The Envelope of type `HeaderType_CONFIG` encodes a `ConfigEnvelope` message as the Payload data field
+- The proto structures for configuration are stored in <u>[`fabric/protos/common/configtx.proto`](./configtx.proto)</u>
+- The Envelope of type `HeaderType_CONFIG` encodes a `ConfigEnvelope` message as the Payload data field
