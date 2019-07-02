@@ -321,6 +321,7 @@ docker-compose -f docker-compose-cli.yaml up -d
 ```bash
 docker exec -it cli bash
 
+# critical
 ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
 # -o: orderer container name + port
@@ -452,32 +453,84 @@ peer chaincode install -n mycc -v 1.0 -p github.com/hyperledger/fabric/examples/
     ```
 
     - `mycc` 已经在 `org1` 上已经实例化，即对应的区块已经生成，所以在 org2 上不能再次初始化
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 - > https://www.cnblogs.com/studyzy/p/7451276.html
+## 升级合约
+
+```bash
+peer chaincode install -n mycc -v 2.0 -p github.com/hyperledger/fabric/examples/chaincode/go/checkBill2
+
+ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer chaincode upgrade -o orderer.example.com:7050 --tls --cafile $ORDERER_CA -C mychannel -n mycc -v 2.0 -c '{"Args":[]}' -P "OR('Org1MSP.member','Org2MSP.member')"
+
+docker exec -it peer0.org1.example.com /bin/bash
+ls /var/hyperledger/production/chaincodes
+# https://github.com/hyperledger/composer/issues/4043
+
+# https://blog.csdn.net/ASN_forever/article/details/87969949
+# https://blog.csdn.net/tiandiwuya/article/details/79418093
+```
+
+## 开发模式
+
+```bash
+# fabric-samples/chaincode-docker-devmode
+docker-compose -f docker-compose-simple.yaml up 
+
+docker exec -it chaincode bash
+cd chaincode_example02/go
+go build chaincode_example02.go
+CORE_PEER_ADDRESS=peer:7051 CORE_CHAINCODE_ID_NAME=mycc2:0 ./chaincode_example02
+
+docker exec -it cli bash
+peer chaincode install -p chaincodedev/chaincode/chaincode_example02/go -n mycc2 -v 0
+peer chaincode instantiate -n mycc2 -v 0 -c '{"Args":["init","a","100","b","200"]}' -C myc
+peer chaincode invoke -n mycc2 -c '{"Args":["invoke","a","b","1"]}' -C myc
+peer chaincode query -n mycc2 -c '{"Args":["query","a"]}' -C myc
+
+
+
+cd chaincode_example04
+go build chaincode_example04.go
+CORE_PEER_ADDRESS=peer:7051 CORE_CHAINCODE_ID_NAME=myccp:0 ./chaincode_example04
+
+mkdir -p /opt/gopath/src/github.com/hyperledger/fabric/common/util
+cp chaincode/utils.go /opt/gopath/src/github.com/hyperledger/fabric/common/util
+peer chaincode install -p chaincodedev/chaincode/chaincode_example04 -n myccp -v 0
+peer chaincode instantiate -n myccp -v 0 -c '{"Args":["init","passThgu","1"]}' -C myc
+peer chaincode invoke -n myccp -c '{"Args":["invoke","mycc", "passThgu", "1"]}' -C myc
+
+
+
+
+go build reconcile.go && CORE_PEER_ADDRESS=peer:7051 CORE_CHAINCODE_ID_NAME=mycc:0 ./reconcile
+
+mkdir -p /opt/gopath/src/github.com/hyperledger/fabric/common/util
+cp chaincode/utils.go /opt/gopath/src/github.com/hyperledger/fabric/common/util
+
+peer chaincode install -p chaincodedev/chaincode/reconcile -n mycc -v 0
+peer chaincode instantiate -n mycc -v 0 -c '{"Args":[]}' -C myc
+
+peer chaincode invoke -C myc -n mycc -c '{"Args":["putICBCUserFlow","icbc","{\"ACC_NO\":\"\",\"ACC_NAME\":\"\",\"CURR_TYPE\":\"\",\"BEGIN_DATE\":\"\",\"END_DATE\":\"\",\"MIN_AMT\":\"\",\"MAX_AMT\":\"888\",\"BANK_TYPE\":\"\",\"NEXT_TAG\":\"\",\"TOTAL_NUM\":\"\",\"DUEBILL_NO\":\"\",\"ACCT_SEQ\":\"\",\"DRCRF\":\"\",\"VOUH_NO\":\"\",\"DEBIT_AMOUNT\":\"\",\"CREDIT_AMOUNT\":\"\",\"BALANCE\":\"\",\"RECIPBK_NO\":\"\",\"RECIPBK_NAME\":\"\",\"RECIPACC_NO\":\"\",\"RECIP_NAME\":\"\",\"SUMMARY\":\"\",\"USE_CN\":\"\",\"POST_SCRIPT\":\"\",\"BUS_CODE\":\"\",\"DATE\":\"\",\"TIME\":\"\",\"REF\":\"\",\"OREF\":\"\",\"EN_SUMMARY\":\"\",\"BUS_TYPE\":\"\",\"VOUH_TYPE\":\"\",\"ADD_INFO\":\"\",\"TOUT_FO\":\"\",\"ONLY_SEQUENCE\":\"0006\",\"AGENT_ACCT_NAME\":\"\",\"AGENT_ACCT_NO\":\"\",\"UP_DTRANF\":\"\",\"VALUE_DATE\":\"\",\"TRX_CODE\":\"\",\"REF1\":\"\",\"OREF1\":\"\",\"CASHF\":\"\",\"BUSI_DATE\":\"\",\"BUSI_TIME\":\"\",\"SEQ_NO\":\"\",\"MG_NO\":\"\",\"MG_ACC_NO\":\"\",\"MG_CURR_TYPE\":\"\",\"CASH_EXF\":\"\"}"]}'
+
+peer chaincode query -C myc -n mycc -c '{"Args":["getICBCUserFlow","icbc", "0006"]}'
+
+
+peer chaincode invoke -C myc -n mycc -c '{"Args":["putZJUserFlow","zhejin","{\"ID\":\"xxx\",\"INNERBILL_NO\":\"0006\",\"OUT_CODE\":\"aaa\",\"ORDER_TYPE\":\"aaa\",\"FUND_ACCOUNT\":\"aaa\",\"CUSTOMER_NAME\":\"lisan\",\"AMOUNT\":\"88\",\"ORDER_STATUS\":\"normal\",\"DEAL_STATUS\":\"normal\",\"BANK_NO\":\"11111\",\"TRANS_CODE\":\"111\",\"MONEY_TYPE\":\"01\"}"]}'
+
+peer chaincode query -C myc -n mycc -c '{"Args":["getZJUserFlow","zhejin", "0006"]}'
+
+peer chaincode query -C myc -n mycc -c '{"Args":["getZJCheckResult","zhejin", "0006"]}'
+
+# https://github.com/hyperledger/fabric-samples/tree/release/chaincode-docker-devmode
+```
+
+## [ ] 创建多通道
+
+```bash
+# ./bin/configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/yourchannel.tx -channelID yourchannel
+
+../../build/bin/configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel2.tx -channelID channel2
+# tree channel-artifacts
+```
+
+- > https://blog.csdn.net/mx1222/article/details/82627785
