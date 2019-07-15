@@ -534,3 +534,5 @@ peer chaincode query -C myc -n mycc -c '{"Args":["getZJCheckResult","zhejin", "0
 ```
 
 - > https://blog.csdn.net/mx1222/article/details/82627785
+# 多机部署
+- https://medium.com/@thotanarendranathreddy/hyperledger-fabric-multi-orgs-multi-nodes-with-kafka-zookeeper-cluster-with-swarm-cluster-5d38be8b1fbc
