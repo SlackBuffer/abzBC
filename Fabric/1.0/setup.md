@@ -228,7 +228,7 @@ services:
 
 #### 配置 CLI
 - CLI 在 Fabric 网络中扮演客户端角色，开发测试的时候可以用 CLI 来代替 SDK，执行各种 SDK 的操作
-- CLI 会和 Peer 相连，把指令发送给对应的 Peer 执行
+- **CLI 会和 Peer 相连**，把指令发送给对应的 Peer 执行
 - `docker-compose-cli.yaml` 存放了**整个 Fabric Docker 环境的配置**
 
 ```yaml

@@ -72,3 +72,6 @@
     2. Create msp client
     3. Register user
     4. Enroll user
+---
+<!-- go build SDKbackEnd/vendor/github.com/miekg/pkcs11: invalid flag in #cgo LDFLAGS: -I/usr/local/share/libtool
+export CGO_LDFLAGS_ALLOW=".*"  -->
