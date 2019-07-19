@@ -1,32 +1,35 @@
 - [Language Guide (proto3)](https://developers.google.com/protocol-buffers/docs/proto3)
+- [Go's generated code from proto](https://developers.google.com/protocol-buffers/docs/reference/go-generated)
 - [API reference](https://developers.google.com/protocol-buffers/docs/reference/overview)
+- [Protocol Buffers Version 3 Language Specification](https://developers.google.com/protocol-buffers/docs/reference/proto3-spec)
 # Basics
-- With protocol buffers, you write a `.proto` description of the data structure you wish to store. From that, the **protocol buffer compiler creates a class** that implements automatic encoding and parsing of the protocol buffer data with an efficient binary format
-    - The generated class provides getters and setters for the fields that make up a protocol buffer and takes care of the details of reading and writing the protocol buffer as a unit
-    - Importantly, the protocol buffer format supports the idea of extending the format over time in such a way that the code can still read data encoded with the old format
+- Protocol buffer data is structured as *messages*, where each message is a small logical record of information containing a series of name-value pairs called *fields*
+- With protocol buffers, you write a `.proto` description of the data structure you wish to store. From that, the protocol buffer compiler creates a **class** that **implements automatic encoding and parsing** of the protocol buffer data with an efficient **binary format**
+    - The generated class **provides getters and setters for the fields** that make up a protocol buffer and takes care of the details of reading and writing the protocol buffer as a unit
+    - You can then use this class in your application to populate, serialize, and retrieve protocol buffer messages
+- The whole purpose of using protocol buffers is to **serialize your data so that it can be parsed elsewhere** (用指定的 proto.pb Marshal 得到的结果后存成二进制文件用作数据共享)
 - https://github.com/protocolbuffers/protobuf/tree/master/examples
 ## [Download protocol buffers](https://developers.google.com/protocol-buffers/docs/downloads)
 - [Download the compiler](https://github.com/protocolbuffers/protobuf/releases)
-- Install the Go protocol buffers `go get -u github.com/golang/protobuf/protoc-gen-go
-`
+- Install the Go protocol buffers `go get -u github.com/golang/protobuf/protoc-gen-go`
 - >https://github.com/protocolbuffers/protobuf/issues/5131
 ## Define protocol format
-- Start with a `.proto` file
+- **Start with a `.proto` file**
 - Definitions: Add a message for each data structure that need to be serialize, then specify a name and a type for each field in the message
 - The `.proto` file starts with a package declaration, which helps to prevent naming conflicts between different projects
-    - In Go, the package name is used as the Go package, unless you have specified a `go_package`. Even if you do provide a `go_package`, you should still define a normal package as well to avoid name collisions in the Protocol Buffers name space as well as in non-Go languages
+    - In Go, the package name is used as the Go package, unless you provide an option `go_package` in your `.proto` file
+    - Even if you do provide a `go_package`, you should still define a normal package as well to avoid name collisions in the Protocol Buffers name space as well as in non-Go languages
 - Many standard simple data types are available as field types, including `bool`, `int32`, `float`, `double`, and `string`
-    - You can also add further structure to your messages by using other message types as field types
-- You can even define message types nested inside other messages
-- You can also define enum types if you want one of your fields to have one of a predefined list of values
-- The " = 1", " = 2" markers on each element identify the unique "tag" that field uses in the binary encoding
+    - You can also add further structure to your messages by **using other message types as field types**
+- You can define message types nested inside other messages
+- You can also define `enum` types if you want one of your fields to have one of a predefined list of values
+- The " = 1", " = 2" markers on each element identify the **unique "tag"** that field uses in the binary encoding
     - Tag numbers 1-15 require one less byte to encode than higher numbers, so as an optimization you can decide to use those tags for the commonly used or repeated elements, leaving tags 16 and higher for less-commonly used optional elements
-    - Each element in a repeated field requires re-encoding the tag number, so repeated fields are particularly good candidates for this optimization
-- If a field value isn't set, a default value is used: zero for numeric types, the empty string for strings, false for bools
-- For embedded messages, the default value is always the "default instance" or "prototype" of the message, which has none of its fields set
-    - Calling the accessor to get the value of a field which has not been explicitly set always returns that field's default value
-- If a field is `repeated`, the field may be repeated any number of times (including zero). The order of the repeated values will be preserved in the protocol buffer
-    - Think of repeated fields as dynamically sized arrays
+        - Each element in a `repeated` field requires re-encoding the tag number, so repeated fields are particularly good candidates for this optimization
+- If a field value isn't set, a **default value** is used: zero for numeric types, the empty string for strings, false for bools
+    - For embedded messages, the default value is always the "default instance" or "prototype" of the message, which has none of its fields set
+- Calling the accessor to get the value of a field which has not been explicitly set always returns that field's default value
+- Think of repeated fields as **dynamically sized arrays**. If a field is `repeated`, the field may be repeated any number of times (including zero). The order of the repeated values will be preserved in the protocol buffer
 ## Compile protocol buffers
 - Now run the compiler, specifying the source directory (where your application's source code lives – the current directory is used if you don't provide a value), the destination directory (where you want the generated code to go; often the same as `$SRC_DIR`), and the path to your `.proto`
 	
@@ -35,6 +38,8 @@
     protoc --go_out=. address_book.proto
     ```
 
+    - The `.pb.go` file is generated by compiling the `.proto` file using the protocol compiler `protoc`
+    - 字段首字母会转为大写
 ## The protocol buffer application
 - Generate `addressbook.pb.go` gives you the following useful types
     - An `AddressBook` structure with a `People` field
@@ -57,17 +62,15 @@
 
     - https://github.com/protocolbuffers/protobuf/blob/master/examples/list_people_test.go
 ## Writing a message
-- The whole purpose of using protocol buffers is to serialize your data so that it can be parsed elsewhere
-- In Go, you use the `proto` library's Marshal function to serialize your protocol buffer data
-    - A pointer to a protocol buffer message's struct implements the `proto.Message` interface
+- In Go, you use the `proto` library's `Marshal` function to serialize your protocol buffer data
     - Calling `proto.Marshal` returns the protocol buffer, encoded in its wire format
+    - A pointer to a protocol buffer message's struct implements the `proto.Message` interface
 ## Reading a message
-- To parse an encoded message, you use the proto library's `Unmarshal` function
+- To parse an encoded message, you use the proto library's `Unmarshal(buf []byte, pb Message)` function
     - Calling this parses the data in `buf` as a protocol buffer and places the result in `pb`
 ## Extending a protocol buffer
 - Sooner or later after you release the code that uses your protocol buffer, you will undoubtedly want to "improve" the protocol buffer's definition
-- If you want your new buffers to be backwards-compatible, and your old buffers to be forward-compatible – and you almost certainly do want this – then there are some rules you need to follow
-- In the new version of the protocol buffer:
+- If you want your new buffers to be backwards-compatible, and your old buffers to be forward-compatible – and you almost certainly do want this – then there are some rules you need to follow. In the new version of the protocol buffer:
     - you must not change the tag numbers of any existing fields
     - you may delete fields
     - you may add new fields but you must use fresh tag numbers (i.e. tag numbers that were never used in this protocol buffer, not even by deleted fields)
@@ -90,7 +93,7 @@ message SearchResponse {
 }
 ```
 
-- The first line of the file specifies that you're using `proto3` syntax: if you don't do this the protocol buffer compiler will assume you are using `proto2`
+- The first line of the file specifies that you're using `proto3` syntax: if you don't do this the protocol buffer compiler will **assume** you are using `proto2`
     - This must be the first non-empty, non-comment line of the file
 ### Specifying field types
 - Scalar types
@@ -98,7 +101,7 @@ message SearchResponse {
     - Enumerations
     - Other message types
 ### Assigning field numbers
-- Each field in the message definition has a **unique number**
+- Each field in the (one) message definition has a **unique number**
     - These field numbers are used to **identify** your fields in the [message binary format](https://developers.google.com/protocol-buffers/docs/encoding), and should not be changed once your message type is in use
 - Field numbers in the range 1 through 15 take **one byte** to encode, including the field number and the field's type (you can find out more about this in [Protocol Buffer Encoding](https://developers.google.com/protocol-buffers/docs/encoding#structure))
 - Field numbers in the range 16 through 2047 take **two bytes**
@@ -110,19 +113,17 @@ message SearchResponse {
 ### Specify field rules
 - Message fields can be one of the following:
     - singular: a well-formed message can have zero or one of this field (but not more than one)
-        - This is the default field rule for proto3 syntax
+        - This is the **default field rule** for proto3 syntax
     - `repeated`: this field can be repeated any number of times (including zero) in a well-formed message
         - The order of the repeated values will be preserved
 - In proto3, `repeated` fields of scalar numeric types use `packed` encoding by default
     - https://developers.google.com/protocol-buffers/docs/encoding#packed
 ### Adding more message types
-- Multiple message types can be defined in a single `.proto` file
-- This is useful if you are defining multiple related messages
+- Multiple message types can be defined in a single `.proto` file. This is useful if you are defining multiple related messages
 ### Adding comments
 - Use C/C++-style `//` and `/* ... */` syntax
 ### Reserved fields
-- If you update a message type by entirely removing a field, or commenting it out, future users can reuse the field number when making their own updates to the type
-- This can cause severe issues if they later load old versions of the same `.proto`, including data corruption, privacy bugs, and so on
+- If you update a message type by entirely removing a field, or commenting it out, future users can reuse the field number when making their own updates to the type. This can cause severe issues if they later load old versions of the same `.proto`, including data corruption, privacy bugs, and so on
 - One way to make sure this doesn't happen is to specify that the field numbers (and/or names, which can also cause issues for JSON serialization) of your deleted fields are `reserved`
 	
     ```proto
@@ -135,6 +136,23 @@ message SearchResponse {
     - The protocol buffer compiler will complain if any future users try to use these field identifiers
     - Can't mix field names and field numbers in the same `reserved` statement
 ### What's generated from `.proto`
-- When you run the protocol buffer compiler on a `.proto`, the compiler generates the code in your chosen language you'll need to work with the message types you've described in the file, including getting and setting field values, serializing your messages to an output stream, and parsing your messages from an input stream
+- When you run the protocol buffer compiler on a `.proto`, the compiler generates the code in your chosen language you'll need to work with the message types you've described in the file, including **getting** and **setting** field values, **serializing** your messages to an output stream, and **parsing** your messages from an input stream
+## Updating a message type
+- Don't change the field numbers for any existing fields
+- If you add new fields, any messages serialized by code using your "old" message format can still be parsed by your new generated code. You should keep in mind the **default values** for these elements so that new code can properly interact with messages generated by old code. Similarly, messages created by your new code can be parsed by your old code: old binaries simply **ignore** the new field when parsing
+- Fields can be removed, as long as the field number is not used again in your updated message type. You may want to **rename** the field instead, perhaps adding the prefix "OBSOLETE_", or make the field number **reserved**, so that future users of your `.proto` can't accidentally reuse the number
+- `int32`, `uint32`, `int64`, `uint64`, and `bool` are all compatible – this means you can change a field from one of these types to another without breaking forwards- or backwards-compatibility
+    - If a number is parsed from the wire which doesn't fit in the corresponding type, you will get the same effect as if you had cast the number to that type in C++ (e.g. if a 64-bit number is read as an `int32`, it will be truncated to 32 bits)
+- `sint32` and `sint64` are compatible with each other but are not compatible with the other integer types
+- `string` and `bytes` are compatible as long as the bytes are valid UTF-8
+- Embedded messages are compatible with `bytes` if the bytes contain an encoded version of the message
+- `fixed32` is compatible with `sfixed32`, and `fixed64` with `sfixed64`
+- `enum` is compatible with `int32`, `uint32`, `int64`, and `uint64` in terms of wire format (note that values will be truncated if they don't fit). However be aware that client code may treat them differently when the message is deserialized: for example, unrecognized proto3 enum types will be preserved in the message, but how this is represented when the message is deserialized is language-dependent. Int fields always just preserve their value
+- Changing a single value into a member of a new `oneof` is safe and binary compatible. Moving multiple fields into a new `oneof` may be safe if you are sure that no code sets more than one at a time. Moving any fields into an existing `oneof` is not safe
+## Unknown fields
+- Unknown fields are well-formed protocol buffer serialized data representing fields that the parser does not recognize
+    - For example, when an old binary parses data sent by a new binary with new fields, those new fields become unknown fields in the old binary
+- Originally, proto3 messages always discarded unknown fields during parsing, but in version 3.5 we reintroduced the preservation of unknown fields to match the proto2 behavior
+- In versions 3.5 and later, unknown fields are **retained during parsing** and **included in the serialized output**
 ## Scalar value types
 ## Default values
