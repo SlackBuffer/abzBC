@@ -92,7 +92,7 @@ which peer
     
         - > `ADD`: If `<src>` is a local tar archive in a recognized compression format (identity, gzip, bzip2 or xz) then it is unpacked as a directory
         - > [Use volumes](https://docs.docker.com/storage/volumes/)
-- `/usr/local/lib` for 国密库
+- `/usr/local/lib` for 国密库，.so 等
 # 书
 - 《Hyperledger Fabric源代码分析与深入解读》_蔡亮.pdf Fabric 1.0
     - csdn 博客出处
