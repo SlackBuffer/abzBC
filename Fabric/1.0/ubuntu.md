@@ -45,5 +45,6 @@ apt install make
 
 # Issues
 - `make cryptogen`: `vendor/github.com/miekg/pkcs11/pkcs11.go:29:18: fatal error: ltdl.h: No such file or directory` 
-    - `apt install libltdl-dev`
-    - > `apt-get install gcc`
+    - `apt-get install gcc`
+    - `apt install libltdl-dev`, `yum install libtool-ltdl-devel`
+    - `yum install bzip2`

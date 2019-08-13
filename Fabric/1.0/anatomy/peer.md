@@ -72,6 +72,7 @@
         ```
     
         - [ ] 为何要编 ccenv-image 镜像？
+            - 生成 chaincode 容器时会用到，生成成功后移除
     - 基于 `fabric-baseos` 编 peer 镜像
     	
         ```dockerfile
@@ -138,3 +139,23 @@
         - The `/var` directory tree is where data that is likely to **change** is stored. Various databases, spool files, user mail, and so forth, are located here
     - `/opt`
         - The `/opt` directory is used to install **“optional” software**. This is mainly used to hold commercial software products that might be installed on the system
+
+- 指定 peer 节点发送交易后，若该 peer 节点安装有对应 chaincode，则会拉起 chaincode 容器。
+
+
+Instantiating chaincode on org2/peer2...
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.key
+CORE_PEER_LOCALMSPID=Org2MSP
+CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/server.crt
+CORE_PEER_TLS_ENABLED=true
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+CORE_PEER_ID=cli
+CORE_LOGGING_LEVEL=DEBUG
+CORE_PEER_ADDRESS=peer0.org2.example.com:7051
+2019-08-02 02:47:39.460 UTC [main] InitCmd -> WARN 001 CORE_LOGGING_LEVEL is no longer supported, please use the FABRIC_LOGGING_SPEC environment variable
+2019-08-02 02:47:39.483 UTC [main] SetOrdererEnv -> WARN 002 CORE_LOGGING_LEVEL is no longer supported, please use the FABRIC_LOGGING_SPEC environment variable
+2019-08-02 02:47:39.503 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 003 Using default escc
+2019-08-02 02:47:39.503 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 004 Using default vscc
+Error: error endorsing chaincode: rpc error: code = Unknown desc = Error starting container: pull access denied for hyperledger/fabric-yxbaseos, repository does not exist or may require 'docker login'

@@ -473,6 +473,30 @@ ls /var/hyperledger/production/chaincodes
 ## 开发模式
 
 ```bash
+# inside cc container
+# cd and build
+cd projectLog/ && go build
+CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=mycc:0 ./projectLog
+
+# inside cli
+# -p 跟的目录相对于 $GOPATH，是目录
+peer chaincode install -p chaincodedev/chaincode/projectLog -n mycc -v 0
+# -C: channel name
+peer chaincode instantiate -n mycc -v 0 -c '{"Args":[]}' -C myc
+
+# add
+# peer chaincode invoke -n mycc -c '{"Args":["add","{\"ProductID\":\"prod8\",\"Step\":0,\"Stage\":2,\"Properties\":[{\"PropertyID\":\"1\",\"PropertyName\":\"资产A\",\"PropertyType\":\"类型A\",\"BuyInfo\":[\"购买记录A\",\"购买记录B\"],\"ReleaseAmount\":[\"释放额度A\",\"释放额度B\"]},{\"PropertyID\":\"2\",\"PropertyName\":\"资产A\",\"PropertyType\":\"类型A\",\"BuyInfo\":[\"购买记录A\",\"购买记录B\"],\"ReleaseAmount\":[\"释放额度A\",\"释放额度B\"]}]}"]}' -C myc
+peer chaincode invoke -n mycc -c '{"Args":["add","{\"ProductID\":\"prod8\",\"Step\":1,\"Stage\":3}"]}' -C myc
+
+# 查产品编号返项目最新记录
+peer chaincode query -n mycc -c '{"Args":["query_product","prod8"]}' -C myc
+
+# 基础资产编号查询相关项目记录，每次返一条
+# property id, index, cutNum
+peer chaincode query -n mycc -c '{"Args":["query_property","2","0","3"]}' -C myc
+```
+
+```bash
 # fabric-samples/chaincode-docker-devmode
 docker-compose -f docker-compose-simple.yaml up 
 
