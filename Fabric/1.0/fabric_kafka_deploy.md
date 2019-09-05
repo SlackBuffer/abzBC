@@ -65,7 +65,7 @@
 - `KAFKA_MIN_INSYNC_REPLICAS`：指定 replicas 的最小数目（必须确认每一个 repica 的写数据都是成功的），如果这个数目没有达到，producer 会产生异常。
 - 对于所有的 Kafka 节点需要配置 `KAFKA_ADVERTISED_HOST_NAME` 为本物理机 IP，`KAFKA_ZOOKEEPER_CONNECT` 需要配置为三个 Zookeeper 的 endpoint (ip:port)。
     - 在多台主机上需要设置 `advertised.host.name` 为本机 IP， 在不进行设置时，默认的设置因操作系统原因可能是本机 IP 也可能是 localhost，为防止出错，需进行设置。
-- 都是本机都用左边（host）；多机时，本机用右边（container），远程用左边（host）
+- `ZOO_SERVERS`: 都是本机都用左边（host）；多机时，本机用右边（container），远程用左边（host）
 - docker-compose-kafka.yaml, dc-kafka.yaml
     - ./bddtests/dc-orderer-base.yml
     - ./bddtests/dc-peer-couchdb.yml

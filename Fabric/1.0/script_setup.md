@@ -459,11 +459,12 @@ peer chaincode install -n mycc -v 1.0 -p github.com/hyperledger/fabric/examples/
 ```bash
 peer chaincode install -n mycc -v 2.0 -p github.com/hyperledger/fabric/examples/chaincode/go/checkBill2
 
+docker exec -it peer0.org1.example.com /bin/bash
+ls /var/hyperledger/production/chaincodes
+
 ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 peer chaincode upgrade -o orderer.example.com:7050 --tls --cafile $ORDERER_CA -C mychannel -n mycc -v 2.0 -c '{"Args":[]}' -P "OR('Org1MSP.member','Org2MSP.member')"
 
-docker exec -it peer0.org1.example.com /bin/bash
-ls /var/hyperledger/production/chaincodes
 # https://github.com/hyperledger/composer/issues/4043
 
 # https://blog.csdn.net/ASN_forever/article/details/87969949
