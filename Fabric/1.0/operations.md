@@ -1,3 +1,11 @@
+- 获取区块
+
+    ```bash
+    peer channel fetch 4 4.block -c channel1 -o orderer0.example.com:56050 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+    ```
+
+    - Returns the most recent block available at the orderer for the channel. This may be a user transaction block or a configuration block. This option will also return the block number of the most recent block.
+- https://godoc.org/github.com/hyperledger/fabric-sdk-go/pkg/client/ledger
 # DEV
 
 ```bash
@@ -93,6 +101,18 @@ which peer
         - > `ADD`: If `<src>` is a local tar archive in a recognized compression format (identity, gzip, bzip2 or xz) then it is unpacked as a directory
         - > [Use volumes](https://docs.docker.com/storage/volumes/)
 - `/usr/local/lib` for 国密库，.so 等
+
+    ```bash
+    # hydra : error : while loading shared libraries: libssh.so.4: cannot open shared object file: No such file
+
+    cp libXXX.so.X /usr/loca/lib
+    vim /etc/ld.so.conf.d/usr-libs.conf 
+    # paste in /usr/local/lib and save
+    ldconfig
+
+    # https://blog.csdn.net/yjk13703623757/article/details/53217377
+    ```
+
 # 书
 - 《Hyperledger Fabric源代码分析与深入解读》_蔡亮.pdf Fabric 1.0
     - csdn 博客出处

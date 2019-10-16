@@ -1,22 +1,7 @@
 # 配置
 - Fabric 索取配置的途径有：环境变量，命令行参数，各种格式的配置文件。其中以配置文件为主，环境变量和命令行参数辅助，三者可以相互作用。主要的配置文件有 `core.yaml`, `orderer.yaml` 等，在 `/fabric/sampleconfig` 中有示例。主要使用的配置用的代码集中在 `/fabric/core/config` 下
 ## 配置文件
-- [viper](https://github.com/spf13/viper)
-	
-    ```go
-    // 设置一个要读取的配置文件名（不包含后缀），一个 viper 只支持一个文件名
-    viper.SetConfigName("config")
-    // 设置一个搜索配置文件的路径，viper 的搜索路径可以有多个
-    viper.AddConfigPath("/etc/appname/")
-    viper.AddConfigPath(".")
-    // 读取配置文件
-    viper.ReadInConfig()
-    // 获取其中一个 name 项的值
-    viper.Get("name")
-    // 将 name 的值设置为 Bill
-    viper.Set("name", "Bill")
-    ```
-
+- > [viper](https://github.com/spf13/viper)
 - peer 对 `core.yaml` 的引入
 	
     ```go
