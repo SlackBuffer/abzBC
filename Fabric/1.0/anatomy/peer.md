@@ -71,7 +71,7 @@
         RUN mkdir -p /chaincode/input /chaincode/output
         ```
     
-        - [ ] 为何要编 ccenv-image 镜像？
+        - [x] 为何要编 ccenv-image 镜像？
             - 生成 chaincode 容器时会用到，生成成功后移除
     - 基于 `fabric-baseos` 编 peer 镜像
     	

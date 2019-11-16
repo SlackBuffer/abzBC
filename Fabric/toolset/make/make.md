@@ -169,11 +169,12 @@
     ```
 
     - `v1 = $(v2)` 中，变量 `v1` 的值是另一个变量 `v2`，`v1` 的值是在定义时扩展（静态扩展），还是在运行时扩展（动态扩展），结果可能会差异很大
+    - https://www.gnu.org/software/make/manual/html_node/Setting.html
 - `make` 命令提供一系列内置变量（Implicit Variables），主要是为了跨平台的兼容性
     - `$(CC)` 指向当前使用的编译器，`$(MAKE)` 指向当前使用的 `make` 工具
     - `CFLAGS`: Extra flags to give to the C compiler
     - > https://www.gnu.org/software/make/manual/html_node/Implicit-Variables.html
-- `make` 命令还提供一些自动变量（Automatic Variables），它们的值与当前规则有关
+- `make` 命令还提供一些自动变量（*Automatic Variables*），它们的值与当前规则有关
     1. `$@` 指代当前目标，就是 `make` 命令当前构建的目标（`make foo` 的 `$@` 指代 `foo`）
     	
         ```makefile

@@ -39,7 +39,7 @@
 
     - 基于 `fabric-baseimage` 编 tools 镜像
     	
-        ```makefile
+        ```dockerfile
         FROM hyperledger/fabric-baseimage:x86_64-0.3.1
         ENV FABRIC_CFG_PATH /etc/hyperledger/fabric
         VOLUME /etc/hyperledger/fabric
