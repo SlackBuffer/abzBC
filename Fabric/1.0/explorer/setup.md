@@ -2,6 +2,10 @@
 - DB
 	
     ```bash
+    https://docs.docker.com/engine/reference/builder/#expose
+    http://dockone.io/article/455
+    https://hub.docker.com/_/postgres
+
     # -p 必须有
     docker run --name fabricexplorerdb -p 5432:5432 -v /Users/slackbuffer/db-data/explorer-data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=slackbuffer -e POSTGRES_USER=hofungkoeng -e POSTGRES_DB=fabricexplorer -d postgres
     lsof -i:5432
